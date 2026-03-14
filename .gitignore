@@ -1,0 +1,28 @@
+# Virtual Environment
+venv/
+env/
+.venv/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Database
+*.sqlite3
+*.db
+plantcare.db
+
+# Machine Learning Models
+*.h5
+*.keras
+*.tflite
+*.onnx
+pred_service/plant_disease_recog_model_pwp.h5
+
+# Environment Variables
+.env
+
+# OS Files
+.DS_Store
+Thumbs.db

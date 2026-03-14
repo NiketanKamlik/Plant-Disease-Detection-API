@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Image - PlantCare AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/frontend/style.css">
+    <link rel="stylesheet" href="/frontend/upload.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animated">
+        <div class="blob blob1"></div>
+        <div class="blob blob2"></div>
+        <div class="blob blob3"></div>
+        <div class="noise-overlay"></div>
+    </div>
+
+    <!-- Main Navigation -->
+    <nav class="glass-nav">
+        <div class="nav-container">
+            <a href="/" class="logo" style="text-decoration: none; color: inherit;">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 22C12 22 20 18 20 12C20 6 12 2 12 2C12 2 4 6 4 12C4 18 12 22 12 22Z" fill="#10B981"/>
+                    <path d="M12 22V12" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span class="logo-text">PlantCare <span class="highlight">API</span></span>
+            </a>
+            
+            <div class="auth-buttons">
+                <!-- Login is not compulsory, but available -->
+                <a href="/login" class="btn btn-ghost" style="text-decoration: none;">Login</a>
+                <a href="/register" class="btn btn-outline" style="text-decoration: none;">Register</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Upload Section -->
+    <main class="upload-main">
+        <div class="upload-container glass-panel fade-in-up">
+            <div class="upload-header">
+                <h2>Plant Analysis <span class="highlight">Portal</span></h2>
+                <p>Upload a clear image of the affected plant leaf for accurate disease detection.</p>
+            </div>
+
+            <div class="upload-zone" id="dropZone">
+                <input type="file" id="fileInput" accept="image/jpeg, image/png, image/webp" hidden>
+                
+                <div class="upload-content" id="uploadContent">
+                    <div class="upload-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7 16A4 4 0 0 1 7 8H8.8C9.5 5.6 11.6 4 14 4C17.3 4 20 6.7 20 10C20 10.5 19.9 11 19.8 11.5C21.6 12.3 22.8 14 22.8 16C22.8 18.2 21 20 18.8 20H7C4.2 20 2 17.8 2 15C2 12.4 4 10.3 6.5 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 11V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9 13L12 10L15 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Drag & Drop your image here</h3>
+                    <p>or</p>
+                    <button class="btn btn-primary" id="browseBtn">Browse Files</button>
+                    <span class="file-hint">Supported formats: JPEG, PNG, WEBP (Max 5MB)</span>
+                </div>
+
+                <!-- Preview State -->
+                <div class="preview-content" id="previewContent" style="display: none;">
+                    <img id="imagePreview" src="" alt="Plant Preview">
+                    <div class="preview-actions">
+                        <button class="btn btn-outline" id="removeFileBtn">Remove</button>
+                        <button class="btn btn-primary" id="analyzeBtn">Analyze Image</button>
+                    </div>
+                </div>
+                
+                <!-- Loading State -->
+                <div class="analyzing-content" id="analyzingContent" style="display: none;">
+                    <div class="scan-container">
+                        <div class="scan-image-wrapper">
+                            <img id="scanImagePreview" src="" alt="Scanning...">
+                            <div class="scan-overlay"></div>
+                            <div class="scan-line-active"></div>
+                        </div>
+                    </div>
+                    <h3>Analyzing Plant Data...</h3>
+                    <p>Our AI is cross-referencing thousands of disease patterns.</p>
+                </div>
+                
+                <!-- Results State -->
+                <div class="results-content" id="resultsContent" style="display: none;">
+                    <div class="result-card glass-panel-inner">
+                        <div class="result-header">
+                            <div class="status-indicator healthy" id="resultStatus"></div>
+                            <h3 id="diseaseName">Analysis Complete</h3>
+                        </div>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" id="confidenceLevel" style="width: 0%;"></div>
+                        </div>
+                        <p class="confidence-text">Confidence: <span id="confidenceText">--%</span></p>
+                        
+                        <div class="recommendation-box">
+                            <h4>Recommended Action</h4>
+                            <p id="recommendationText">Awaiting analysis...</p>
+                        </div>
+                        
+                        <button class="btn btn-outline w-100 mt-4" id="resetBtn">Analyze Another Image</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script src="/frontend/upload.js"></script>
+</body>
+</html>
