@@ -8,91 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/frontend/style.css">
-    
-    <style>
-        .info-main {
-            min-height: 100vh;
-            padding: 8rem 1.5rem 4rem;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-        }
-
-        .info-container {
-            width: 100%;
-            max-width: 800px;
-            padding: 3rem;
-        }
-
-        .info-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .info-header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-
-        .info-card {
-            background: rgba(16, 185, 129, 0.05);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 2rem;
-            transition: transform 0.3s ease;
-        }
-
-        .info-card:hover {
-            transform: translateY(-5px);
-            background: rgba(16, 185, 129, 0.1);
-        }
-
-        .info-card h3 {
-            color: var(--primary);
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .info-card p, .info-card li {
-            color: var(--text-muted);
-            line-height: 1.6;
-            font-size: 0.95rem;
-        }
-        
-        .info-card ul {
-            padding-left: 1.5rem;
-            margin-top: 1rem;
-        }
-
-        .info-card li {
-            margin-bottom: 0.5rem;
-        }
-
-        .action-container {
-            text-align: center;
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid var(--glass-border);
-        }
-
-        @media (max-width: 768px) {
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-            .info-container {
-                padding: 2rem 1.5rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="/frontend/info.css">
 </head>
 <body>
     <!-- Animated Background -->
@@ -178,45 +94,6 @@
         </div>
     </main>
 
-    <script>
-        // Check if user is logged in
-        document.addEventListener('DOMContentLoaded', () => {
-            const userStr = localStorage.getItem('user');
-            
-            if (!userStr) {
-                window.location.href = '/login';
-                return;
-            }
-
-            const navAuth = document.getElementById('navAuth');
-            if (userStr && navAuth) {
-                const user = JSON.parse(userStr);
-                navAuth.innerHTML = `
-                    <span style="color: var(--text-muted); margin-right: 15px;">Welcome, ${user.name}</span>
-                    <button class="btn btn-ghost" onclick="logout()">Logout</button>
-                `;
-            } else if (navAuth) {
-                navAuth.innerHTML = `
-                    <a href="/login" class="btn btn-ghost">Login</a>
-                `;
-            }
-
-            // Animate Blob follow mouse
-            const blobs = document.querySelectorAll('.blob');
-            document.addEventListener('mousemove', (e) => {
-                const x = e.clientX / window.innerWidth;
-                const y = e.clientY / window.innerHeight;
-                blobs.forEach((blob, index) => {
-                    const speed = (index + 1) * 20;
-                    blob.style.transform = `translate(${(x - 0.5) * speed}px, ${(y - 0.5) * speed}px)`;
-                });
-            });
-        });
-
-        function logout() {
-            localStorage.removeItem('user');
-            window.location.href = '/login';
-        }
-    </script>
+    <script src="/frontend/info.js"></script>
 </body>
 </html>
