@@ -13,6 +13,7 @@ class User(Base):
     is_active = Column(Boolean, default=True)
 
     api_keys = relationship("APIKey", back_populates="owner")
+    history = relationship("PredictionHistory", back_populates="user")
 
 class APIKey(Base):
     __tablename__ = "api_keys"
@@ -25,3 +26,15 @@ class APIKey(Base):
     is_active = Column(Boolean, default=True)
 
     owner = relationship("User", back_populates="api_keys")
+
+class PredictionHistory(Base):
+    __tablename__ = "prediction_history"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    disease_name = Column(String)
+    confidence = Column(Integer)
+    recommendation = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User", back_populates="history")

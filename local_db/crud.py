@@ -61,3 +61,28 @@ def validate_api_key(db: Session, key: str):
         return None
         
     return db_key.owner
+
+# History Operations
+def get_user_history(db: Session, user_id: int):
+    return db.query(models.PredictionHistory).filter(models.PredictionHistory.user_id == user_id).order_by(models.PredictionHistory.created_at.desc()).all()
+
+def create_history_entry(db: Session, history: schemas.HistoryCreate):
+    db_history = models.PredictionHistory(**history.dict())
+    db.add(db_history)
+    db.commit()
+    db.refresh(db_history)
+    return db_history
+
+# Profile Operations
+def update_user(db: Session, user_id: int, user_update: schemas.UserUpdate):
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not db_user:
+        return None
+    
+    update_data = user_update.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_user, key, value)
+    
+    db.commit()
+    db.refresh(db_user)
+    return db_user

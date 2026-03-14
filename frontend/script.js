@@ -180,10 +180,48 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('resetBtn').onclick = () => window.location.reload();
     }
 
-    // --- 7. Dashboard / API Key Management ---
+    // --- 7. Dashboard Sections & Logic ---
     const keysList = document.getElementById('keysList');
     if (keysList && userStr) {
         const user = JSON.parse(userStr);
+        
+        // Globally accessible for the dashboard
+        window.switchSection = (sectionId) => {
+            document.querySelectorAll('.dashboard-section').forEach(s => s.style.display = 'none');
+            document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+            document.getElementById(`section-${sectionId}`).style.display = 'block';
+            document.getElementById(`nav-${sectionId}`).classList.add('active');
+
+            if (sectionId === 'history') loadHistory();
+            if (sectionId === 'profile') loadProfile();
+        };
+
+        const loadHistory = async () => {
+            try {
+                const res = await fetch(`/api/auth/history/${user.id}`);
+                const history = await res.json();
+                const list = document.getElementById('historyList');
+                if (!history || history.length === 0) return;
+                list.innerHTML = history.map(h => `
+                    <div class="history-item fade-in">
+                        <div class="history-date">${new Date(h.created_at).toLocaleDateString()}</div>
+                        <div class="history-name">${h.disease_name}</div>
+                        <div class="history-confidence">${h.confidence}% Match</div>
+                        <button class="btn btn-ghost btn-sm" onclick="alert('Rec: ${h.recommendation}')">View Rec</button>
+                    </div>
+                `).join('');
+            } catch (e) { console.error(e); }
+        };
+
+        const loadProfile = async () => {
+            try {
+                const res = await fetch(`/api/auth/profile/${user.id}`);
+                const data = await res.json();
+                document.getElementById('profile-name').value = data.name;
+                document.getElementById('profile-email').value = data.email;
+            } catch (e) { console.error(e); }
+        };
+
         const loadKeys = async () => {
             try {
                 const res = await fetch(`/api/keys/?user_id=${user.id}`);
@@ -203,13 +241,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (err) { console.error(err); }
         };
-        loadKeys();
-        
-        // Globally accessible for the button
+
+        // Profile Form Handling
+        const profileForm = document.getElementById('profileForm');
+        if (profileForm) {
+            profileForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('updateProfileBtn');
+                btn.disabled = true;
+                btn.innerText = 'Saving...';
+                try {
+                    const res = await fetch(`/api/auth/profile/${user.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: document.getElementById('profile-name').value,
+                            email: document.getElementById('profile-email').value
+                        })
+                    });
+                    const updated = await res.json();
+                    if (res.ok) {
+                        localStorage.setItem('user', JSON.stringify(updated));
+                        document.getElementById('navAuth').querySelector('span').innerText = `Welcome, ${updated.name}`;
+                        alert('Profile updated!');
+                    }
+                } catch (e) { alert('Update failed'); }
+                btn.disabled = false;
+                btn.innerText = 'Save Changes';
+            });
+        }
+
         window.generateNewKey = async () => {
             const res = await fetch(`/api/keys/generate?user_id=${user.id}&user_name=${user.name}`, { method: 'POST' });
             if (res.ok) loadKeys();
         };
+
+        loadKeys();
     }
 
     // --- 8. Password Toggle ---

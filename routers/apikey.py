@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
 from local_db import crud, models, schemas, database
-from .auth import get_current_user # We'll need to implement this or a simplified version
 from typing import List
 
 router = APIRouter(prefix="/api/keys", tags=["API Keys"])
