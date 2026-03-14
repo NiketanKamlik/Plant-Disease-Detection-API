@@ -4,19 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlantCare AI - Disease Detection</title>
-    <!-- Use Outfit font for a modern, organic feel -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/frontend/style.css">
 </head>
 <body>
-    <!-- Initial Loading Screen matching the theme -->
     <div id="loader" class="loader-overlay">
         <div class="loader-content">
             <div class="leaf-loader">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="leaf-svg">
-                    <!-- Leaf shape -->
                     <path d="M12 22C12 22 20 18 20 12C20 6 12 2 12 2C12 2 4 6 4 12C4 18 12 22 12 22Z" fill="#10B981" class="leaf-pulse"/>
                     <path d="M12 22V12" stroke="#064E3B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -27,7 +24,6 @@
         </div>
     </div>
 
-    <!-- Animated Background -->
     <div class="bg-animated">
         <div class="blob blob1"></div>
         <div class="blob blob2"></div>
@@ -35,7 +31,6 @@
         <div class="noise-overlay"></div>
     </div>
 
-    <!-- Main Navigation -->
     <nav class="glass-nav">
         <div class="nav-container">
             <div class="logo">
@@ -45,16 +40,13 @@
                 </svg>
                 <span class="logo-text">PlantCare <span class="highlight">API</span></span>
             </div>
-            
-            <div class="auth-buttons">
-                <!-- Login is not compulsory, but available -->
+            <div class="auth-buttons" id="navAuth">
                 <a href="/login" class="btn btn-ghost" style="text-decoration: none;">Login</a>
                 <a href="/register" class="btn btn-outline" style="text-decoration: none;">Register</a>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <main class="hero">
         <div class="hero-container">
             <div class="hero-content glass-panel fade-in-up">
@@ -63,41 +55,26 @@
                 </div>
                 <h1>Diagnose Plant Health in <span class="highlight-gradient">Real-Time</span></h1>
                 <p>Upload a photo of your plant's leaves. Our advanced computer vision engine will instantly identify diseases, nutrient deficiencies, and recommend treatments.</p>
-                
-                <!-- Main CTA - Guest allowed -->
                 <div class="cta-group">
                     <a href="/upload" class="btn btn-primary btn-large" style="text-decoration: none;">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="17 8 12 3 7 8"></polyline>
-                            <line x1="12" y1="3" x2="12" y2="15"></line>
-                        </svg>
                         Upload Plant Image
                     </a>
                     <div class="guest-note">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                         <span>No login required to try</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Visual Scanner Demonstration -->
             <div class="hero-visual glass-panel fade-in-up delay-1">
                 <div class="scanner-ui">
                     <div class="mock-image-container">
-                        <!-- Abstract leaf representation -->
-                        <svg class="abstract-leaf" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg class="abstract-leaf" viewBox="0 0 100 100" fill="none">
                             <path d="M50 90C50 90 85 75 85 50C85 25 50 10 50 10C50 10 15 25 15 50C15 75 50 90 50 90Z" fill="var(--glass-bg)" stroke="#10B981" stroke-width="3"/>
-                            <!-- Simulated spots -->
                             <circle cx="35" cy="45" r="4" fill="#F59E0B" class="spot"/>
                             <circle cx="65" cy="55" r="3" fill="#F59E0B" class="spot"/>
-                            <circle cx="45" cy="65" r="5" fill="#EF4444" class="spot"/>
                         </svg>
-                        
-                        <!-- Scanning line animation -->
                         <div class="scan-line"></div>
                     </div>
-                    
                     <div class="scanner-results">
                         <div class="result-item loading-skeleton"></div>
                         <div class="result-item loading-skeleton short"></div>
@@ -106,7 +83,6 @@
             </div>
         </div>
     </main>
-
     <script src="/frontend/script.js"></script>
 </body>
 </html>
