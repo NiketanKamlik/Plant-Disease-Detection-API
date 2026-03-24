@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 3. Auth Guard & User State (Shared) ---
     const userStr = sessionStorage.getItem('user');
     const navAuth = document.getElementById('navAuth');
-    
+
     // Auth Guard for Info/Dashboard/Upload (if needed)
     const protectedPages = ['/info', '/dashboard'];
     if (protectedPages.some(p => window.location.pathname.includes(p)) && !userStr) {
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const originalText = btn.innerHTML;
             btn.innerHTML = 'Logging in...';
             btn.disabled = true;
-            
+
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const btn = registerForm.querySelector('button[type="submit"]');
             btn.innerHTML = 'Creating Account...';
             btn.disabled = true;
-            
+
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
@@ -178,7 +178,17 @@ document.addEventListener('DOMContentLoaded', () => {
             formData.append("file", currentFile);
 
             try {
-                const res = await fetch('/api/predict', { method: 'POST', body: formData });
+                const headers = {};
+                const activeKey = sessionStorage.getItem('active_api_key');
+                if (activeKey) {
+                    headers['X-API-KEY'] = activeKey;
+                }
+
+                const res = await fetch('/api/predict', { 
+                    method: 'POST', 
+                    headers: headers,
+                    body: formData 
+                });
                 const data = await res.json();
                 setTimeout(() => showResults(data), 2000);
             } catch (err) {
@@ -197,15 +207,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const isHealthy = data.is_healthy || diseaseName.toLowerCase().includes('healthy');
             const medicine = data.medicine || '';
             const precaution = data.precaution || '';
+            const predictionSource = data.prediction_source || 'Local Model';
 
             document.getElementById('diseaseName').textContent = diseaseName;
             document.getElementById('confidenceText').textContent = `${confidence}%`;
             document.getElementById('confidenceLevel').style.width = `${Math.round(confidence)}%`;
             document.getElementById('recommendationText').textContent = recommendation;
             
+            const sourceTextEl = document.getElementById('serviceSourceText');
+            if (sourceTextEl) sourceTextEl.textContent = predictionSource;
+
             const medBox = document.getElementById('medicineBox');
             const precBox = document.getElementById('precautionBox');
-            
+
             if (!isHealthy && (medicine || precaution)) {
                 if (medicine && medicine !== 'None needed.' && medicine !== 'N/A') {
                     medBox.style.display = 'flex';
@@ -213,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     medBox.style.display = 'none';
                 }
-                
+
                 if (precaution && precaution !== 'None needed.' && precaution !== 'N/A') {
                     precBox.style.display = 'flex';
                     document.getElementById('precautionText').textContent = precaution;
@@ -248,20 +262,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const keysList = document.getElementById('keysList');
     if (keysList && userStr) {
         const user = JSON.parse(userStr);
-        
+
         window.switchSection = (sectionId) => {
             const sections = ['overview', 'keys', 'history', 'profile'];
             sections.forEach(s => {
                 const el = document.getElementById(`section-${s}`);
                 if (el) el.style.display = (s === sectionId) ? 'block' : 'none';
-                
+
                 const nav = document.getElementById(`nav-${s}`);
                 if (nav) nav.classList.toggle('active', s === sectionId);
             });
 
             if (sectionId === 'history') loadHistory();
             if (sectionId === 'profile') loadProfile();
-            if (sectionId === 'overview' || sectionId === 'keys') loadKeys(); 
+            if (sectionId === 'overview' || sectionId === 'keys') loadKeys();
         };
 
         const loadHistory = async () => {
@@ -294,20 +308,20 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const res = await fetch(`/api/keys/?user_id=${user.id}`);
                 const keys = await res.json();
-                
+
                 // --- Update Overview Stats ---
                 const totalUsage = keys.reduce((sum, k) => sum + (k.usage_count || 0), 0);
                 const quotaLimit = keys.reduce((sum, k) => sum + (k.usage_limit || 1000), 0);
-                
+
                 const welcomeName = document.getElementById('welcome-name');
                 if (welcomeName) welcomeName.textContent = user.name;
-                
+
                 const totalReqEl = document.getElementById('stat-total-requests');
                 if (totalReqEl) totalReqEl.textContent = totalUsage.toLocaleString();
-                
+
                 const quotaCountEl = document.getElementById('stat-quota-count');
                 if (quotaCountEl) quotaCountEl.textContent = `${totalUsage}/${quotaLimit}`;
-                
+
                 const quotaBar = document.getElementById('stat-quota-bar');
                 if (quotaBar) quotaBar.style.width = `${Math.min((totalUsage / quotaLimit) * 100, 100)}%`;
 
@@ -386,7 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.generateNewKey = async () => {
             const nameInput = document.getElementById('key-name-input');
             const keyName = nameInput.value.trim();
-            
+
             if (!keyName) {
                 alert("Please enter a name for your API key.");
                 return;
@@ -397,10 +411,10 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.innerText = 'Generating...';
 
             try {
-                const res = await fetch(`/api/keys/generate?user_id=${user.id}&user_name=${encodeURIComponent(user.name)}&key_name=${encodeURIComponent(keyName)}`, { 
-                    method: 'POST' 
+                const res = await fetch(`/api/keys/generate?user_id=${user.id}&user_name=${encodeURIComponent(user.name)}&key_name=${encodeURIComponent(keyName)}`, {
+                    method: 'POST'
                 });
-                
+
                 if (res.ok) {
                     nameInput.value = '';
                     loadKeys();

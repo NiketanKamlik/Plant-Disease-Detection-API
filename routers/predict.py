@@ -72,7 +72,8 @@ async def predict_disease(
             "medicine": result.get("medicine", ""),
             "precaution": result.get("precaution", ""),
             "is_healthy": result.get("is_healthy", False),
-            "source": user_name
+            "source": user_name,
+            "prediction_source": result.get("prediction_source", "Unknown")
         })
             
     except Exception as e:

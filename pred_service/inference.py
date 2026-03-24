@@ -8,6 +8,7 @@ from tensorflow.keras.applications.efficientnet import preprocess_input
 from .constants import IMG_SIZE, CLASS_NAMES
 from .disease_info import DISEASE_INFO
 from .downloader import download_model_if_missing
+from .external_api import get_external_prediction
 
 # Try to load the model. We expect the user to place the .h5 file in this pred_service folder
 model_path = os.path.join(os.path.dirname(__file__), "plant_disease_recog_model_pwp.h5")
@@ -101,15 +102,29 @@ def process_image_and_predict(image_bytes: bytes) -> dict:
             rec_text = f"Isolate the {plant} plant to prevent spread. Apply appropriate treatments for {disease} and monitor frequently."
 
         # Format and Return JSON
-        return {
+        result_dict = {
             "success": True,
             "is_healthy": is_healthy,
             "disease_name": f"{plant} - {disease}",
             "confidence": confidence,
             "recommendation": rec_text,
             "medicine": medicine_text,
-            "precaution": precaution_text
+            "precaution": precaution_text,
+            "prediction_source": "Local Model"
         }
+
+        # --- FALLBACK LOGIC ---
+        # If the model detects 'No Leaf' (Background_without_leaves) OR confidence is very low,
+        # we consult the "legit" external API for a more accurate second opinion.
+        is_background = (predicted_class == 'Background_without_leaves')
+        
+        if is_background or confidence < 40:
+             print(f"Triggering External Fallback (Reason: {'Non-leaf detected' if is_background else f'Low confidence {confidence:.1f}%'})")
+             external_res = get_external_prediction(image_bytes)
+             if external_res.get("success"):
+                 return external_res
+
+        return result_dict
         
     except Exception as e:
         return {"success": False, "error": str(e)}
