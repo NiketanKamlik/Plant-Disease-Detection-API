@@ -26,3 +26,18 @@ pred_service/plant_disease_recog_model_pwp.h5
 # OS Files
 .DS_Store
 Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Logs and Debug
+*.log
+output.txt
+
+# Testing & Caches
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/

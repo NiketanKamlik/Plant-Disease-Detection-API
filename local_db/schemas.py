@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 from datetime import datetime
 from typing import List, Optional
 
@@ -24,8 +24,7 @@ class APIKeyOut(BaseModel):
     usage_limit: int
     is_active: bool
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 # Base properties for User
 class UserBase(BaseModel):
@@ -56,8 +55,7 @@ class HistoryOut(HistoryBase):
     api_key_id: Optional[int] = None
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 # Used for returning user data (hides password)
 class UserOut(UserBase):
@@ -67,8 +65,7 @@ class UserOut(UserBase):
     api_keys: List[APIKeyOut] = []
     history: List[HistoryOut] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 # Used for login requests
 class UserLogin(BaseModel):

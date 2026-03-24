@@ -1027,12 +1027,28 @@ p {
     transform: scale(1.02);
 }
 
+.upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+}
+
 .upload-icon {
     width: 80px;
     height: 80px;
     color: var(--primary);
-    margin-bottom: 1rem;
+    margin: 0 auto 1rem auto;
     filter: drop-shadow(0 0 10px var(--primary-glow));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.upload-icon svg {
+    width: 100%;
+    height: 100%;
 }
 
 .file-hint {
