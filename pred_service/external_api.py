@@ -6,7 +6,7 @@ import base64
 
 # Plant.id API Configuration (v3)
 # Get your API key at https://admin.kindwise.com/
-PLANT_ID_API_KEY = os.getenv("PLANT_ID_API_KEY", "X8taLZru9amlgkx3n6V6Y3cU8Jz9TwwTfPLhPSIlzB8oL35HMH") 
+PLANT_ID_API_KEY = os.getenv("PLANT_ID_API_KEY") 
 PLANT_ID_API_URL = os.getenv("PLANT_ID_API_URL", "https://api.plant.id/v3/health_assessment")
 
 def get_external_prediction(image_bytes: bytes) -> dict:

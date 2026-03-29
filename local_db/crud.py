@@ -42,10 +42,8 @@ def create_api_key(db: Session, user_id: int, user_name: str, key_name: str):
     # Generate a unique key
     new_key = str(uuid.uuid4()).replace("-", "")
     
-    expires_at = None
-    # If not admin 'niket', set expiry to 2 months (60 days)
-    if user_name.lower() != "niket":
-        expires_at = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(days=60)
+    # Default expiry to 6 MONTHS (180 days) for all user keys to ensure rotation.
+    expires_at = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(days=180)
     
     db_key = models.APIKey(
         key=new_key,

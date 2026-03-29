@@ -93,6 +93,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await res.json();
                 if (res.ok && data.success) {
                     sessionStorage.setItem('user', JSON.stringify(data.user));
+                    if (data.access_token) {
+                        sessionStorage.setItem('access_token', data.access_token);
+                    }
                     window.location.href = '/dashboard';
                 } else {
                     alert(data.detail || 'Login failed');
@@ -312,7 +315,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const loadHistory = async () => {
             try {
-                const res = await fetch(`/api/auth/history/${user.id}`);
+                const res = await fetch(`/api/auth/history/${user.id}`, {
+                    headers: getAuthHeaders()
+                });
                 const history = await res.json();
                 const list = document.getElementById('historyList');
                 if (!history || history.length === 0) return;
@@ -329,7 +334,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const loadProfile = async () => {
             try {
-                const res = await fetch(`/api/auth/profile/${user.id}`);
+                const res = await fetch(`/api/auth/profile/${user.id}`, {
+                    headers: getAuthHeaders()
+                });
                 const data = await res.json();
                 document.getElementById('profile-name').value = data.name;
                 document.getElementById('profile-email').value = data.email;
@@ -338,7 +345,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const loadKeys = async () => {
             try {
-                const res = await fetch(`/api/keys/?user_id=${user.id}`);
+                const res = await fetch(`/api/keys/`, {
+                    headers: getAuthHeaders()
+                });
                 const keys = await res.json();
 
                 // --- Update Overview Stats ---
@@ -411,7 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     const res = await fetch(`/api/auth/profile/${user.id}`, {
                         method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: getAuthHeaders(),
                         body: JSON.stringify({
                             name: document.getElementById('profile-name').value,
                             email: document.getElementById('profile-email').value
@@ -446,8 +455,9 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.innerText = 'Generating...';
 
             try {
-                const res = await fetch(`/api/keys/generate?user_id=${user.id}&user_name=${encodeURIComponent(user.name)}&key_name=${encodeURIComponent(keyName)}`, {
-                    method: 'POST'
+                const res = await fetch(`/api/keys/generate?key_name=${encodeURIComponent(keyName)}`, {
+                    method: 'POST',
+                    headers: getAuthHeaders()
                 });
 
                 if (res.ok) {
@@ -488,5 +498,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function logout() {
     sessionStorage.removeItem('user');
+    sessionStorage.removeItem('access_token');
     window.location.href = '/login';
+}
+
+/**
+ * Centrally manages authentication headers for all fetch calls.
+ * Ensures the JWT token is present for protected routes.
+ */
+function getAuthHeaders(includeJson = true) {
+    const headers = {};
+    if (includeJson) {
+        headers['Content-Type'] = 'application/json';
+    }
+    const token = sessionStorage.getItem('access_token');
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    return headers;
 }

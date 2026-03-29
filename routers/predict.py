@@ -37,9 +37,19 @@ async def predict_disease(
         
         user_name = user.name
 
+    # 1. File Type Validation
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="Invalid file type. Please upload an image.")
+
+    # 2. File Size Validation (5MB Limit)
+    MAX_FILE_SIZE = 5 * 1024 * 1024 # 5MB
+    
     try:
         # Read the uploaded image bytes
         contents = await file.read()
+        
+        if len(contents) > MAX_FILE_SIZE:
+            raise HTTPException(status_code=413, detail="File too large. Maximum size is 5MB.")
         
         # Delegate task to the prediction service
         result = process_image_and_predict(contents)

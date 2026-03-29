@@ -8,9 +8,10 @@ load_dotenv()
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = os.getenv("TF_ENABLE_ONEDNN_OPTS", "0")
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = os.getenv("TF_CPP_MIN_LOG_LEVEL", "2")
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 
-# Import routes
+# Register routers
 from routers import home, upload, predict, auth, info, apikey
 from local_db.database import engine
 from local_db import models
@@ -19,6 +20,26 @@ from local_db import models
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(docs_url=None, redoc_url=None)
+
+# 1. CORS Configuration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # In production, replace with specific origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# 2. Security Headers Middleware
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers["Content-Security-Policy"] = "default-src 'self' https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:;"
+    return response
 
 # Make sure frontend dir exists conceptually
 frontend_dir = pathlib.Path("frontend")
