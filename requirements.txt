@@ -4,6 +4,7 @@ tensorflow==2.20.0
 Pillow==12.0.0
 python-multipart==0.0.22
 SQLAlchemy==2.0.43
+psycopg2-binary==2.9.10
 bcrypt==5.0.0
 pydantic==2.12.4
 email-validator==2.3.0

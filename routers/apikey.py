@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
-from local_db import crud, models, schemas, database, auth_utils
+from database import crud, models, schemas, database, auth_utils
 from typing import List
 
 router = APIRouter(prefix="/api/keys", tags=["API Keys"])

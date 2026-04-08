@@ -1,8 +1,7 @@
-from local_db.database import engine, Base
-from local_db import models
+from database.database import engine, Base
+from database import models
 import os
 
-db_path = "plantcare.db"
 
 def reset_db():
     print("Dropping all existing tables...")

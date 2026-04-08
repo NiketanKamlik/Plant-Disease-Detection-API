@@ -2,7 +2,7 @@ from fastapi import APIRouter, UploadFile, File, Header, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from pred_service import process_image_and_predict
-from local_db import database, crud, schemas
+from database import database, crud, schemas
 import io
 
 router = APIRouter()

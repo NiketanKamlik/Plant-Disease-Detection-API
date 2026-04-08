@@ -13,8 +13,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # Register routers
 from routers import home, upload, predict, auth, info, apikey
-from local_db.database import engine
-from local_db import models
+from database.database import engine
+from database import models
 
 # Create database tables
 models.Base.metadata.create_all(bind=engine)

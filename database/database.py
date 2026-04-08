@@ -3,14 +3,17 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# For local development, we use SQLite. 
-# Later, you can easily switch this to PostgreSQL (e.g., 'postgresql://user:password@localhost/dbname')
+# For local development, SQLite is still supported as a fallback.
+# In production, use PostgreSQL via SQLALCHEMY_DATABASE_URL.
 SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL", "sqlite:///./plantcare.db")
 
-# connect_args={"check_same_thread": False} is needed only for SQLite
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-)
+if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
+    engine = create_engine(
+        SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+    )
+else:
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()

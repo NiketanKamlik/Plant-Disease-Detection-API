@@ -23,8 +23,8 @@ def get_register_page():
 # --- API Endpoints for Authentication ---
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from local_db.database import get_db
-from local_db import crud, schemas, models, auth_utils
+from database.database import get_db
+from database import crud, schemas, models, auth_utils
 
 @router.post("/api/auth/register", response_model=schemas.UserOut)
 def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
