@@ -22,6 +22,8 @@ services:
         value: "0"
       - key: TF_CPP_MIN_LOG_LEVEL
         value: "2"
+      - key: PYTHON_VERSION
+        value: 3.11.9
 
 databases:
   - name: plant-db
