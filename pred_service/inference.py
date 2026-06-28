@@ -6,51 +6,29 @@ from PIL import Image
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.efficientnet import preprocess_input
 from .constants import IMG_SIZE, CLASS_NAMES
-from .downloader import download_model_if_missing
 from .external_api import get_external_prediction
 from .disease_advice import get_local_advice
 
-# Configuration for the model
-model_path = os.path.join(os.path.dirname(__file__), "plant_disease_recog_model_pwp.h5")
-# --- CLOUD DEPLOYMENT URL ---
-MODEL_URL = "https://drive.google.com/file/d/14y3Jp8-hB7v3q1HosU0cxOP9TM2e7h1j/view?usp=drive_link"
+# Use the lightweight TFLite model included in the repo
+model_path = os.path.join(os.path.dirname(__file__), "plant_disease_recog_model_pwp.tflite")
 
-# We defer loading until the prediction is called to speed up server startup
-model = None
+interpreter = None
+input_details = None
+output_details = None
 
 def process_image_and_predict(image_bytes: bytes) -> dict:
-    """
-    Dedicated function to handle prediction logic using the custom loaded model.
-    Accepts raw image bytes, performs inference, and returns a JSON-serializable dict.
-    """
-    global model
+    global interpreter, input_details, output_details
     
-    if model is None:
-        # Load the model only when needed
+    if interpreter is None:
         try:
-            # Check for low memory environment (e.g. Render Starter Plan with 512MB RAM)
-            is_low_memory = False
-            if os.path.exists('/proc/meminfo'):
-                with open('/proc/meminfo', 'r') as f:
-                    mem_kb = int(f.readline().split()[1])
-                    if mem_kb < 800000: # Less than ~800MB
-                        is_low_memory = True
-            
-            if is_low_memory:
-                print("Low memory environment detected (<800MB). Skipping local 769MB model to prevent OOM crash.")
-                raise MemoryError("Insufficient RAM to load the local model.")
-
-            # First, ensure the model exists (download if missing)
-            download_model_if_missing(model_path, MODEL_URL)
-            
-            if os.path.exists(model_path):
-                print(f"Loading model for the first time from {model_path}...")
-                model = tf.keras.models.load_model(model_path)
-                print("Model loaded successfully.")
-            else:
-                raise FileNotFoundError(f"Model file not found at {model_path}.")
+            print(f"Loading TFLite model from {model_path}...")
+            interpreter = tf.lite.Interpreter(model_path=model_path)
+            interpreter.allocate_tensors()
+            input_details = interpreter.get_input_details()
+            output_details = interpreter.get_output_details()
+            print("TFLite Model loaded successfully.")
         except Exception as e:
-            print(f"Error loading local model: {e}. Falling back to External API.")
+            print(f"Error loading TFLite model: {e}. Falling back to External API.")
             external_res = get_external_prediction(image_bytes)
             if external_res.get("success"):
                 external_res["prediction_source"] = "External API (Local Model Fallback)"
@@ -69,8 +47,10 @@ def process_image_and_predict(image_bytes: bytes) -> dict:
 
         img_array = preprocess_input(img_array)
 
-        # Prediction
-        predictions = model(img_array, training=False).numpy()
+        # Prediction using TFLite
+        interpreter.set_tensor(input_details[0]['index'], img_array)
+        interpreter.invoke()
+        predictions = interpreter.get_tensor(output_details[0]['index'])
 
         predicted_index = np.argmax(predictions[0])
         predicted_class = CLASS_NAMES[predicted_index]
