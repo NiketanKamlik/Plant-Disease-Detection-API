@@ -24,7 +24,7 @@ app = FastAPI(docs_url=None, redoc_url=None)
 
 cors_origins = [
     origin.strip()
-    for origin in os.getenv("CORS_ALLOW_ORIGINS", "").split(",")
+    for origin in os.getenv("CORS_ALLOW_ORIGINS", "*").split(",")
     if origin.strip()
 ]
 
