@@ -76,6 +76,7 @@ app.include_router(apikey.router)
 
 
 @app.get("/healthz")
+@app.head("/healthz")
 def health_check():
     return {"status": "ok"}
 

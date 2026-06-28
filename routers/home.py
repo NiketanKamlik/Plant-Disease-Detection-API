@@ -6,6 +6,7 @@ router = APIRouter()
 frontend_dir = pathlib.Path("frontend")
 
 @router.get("/", response_class=HTMLResponse)
+@router.head("/", response_class=HTMLResponse)
 def read_root():
     html_path = frontend_dir / "index.html"
     if html_path.exists():
