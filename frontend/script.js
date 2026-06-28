@@ -219,10 +219,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: formData 
                 });
                 const data = await res.json();
+                
+                if (!res.ok || data.success === false) {
+                    alert("Analysis failed: " + (data.error || data.detail || "Unknown error"));
+                    analyzingContent.style.display = 'none';
+                    previewContent.style.display = 'flex';
+                    return;
+                }
+                
                 showResults(data);
             } catch (err) {
                 console.error(err);
-                alert("Analysis failed.");
+                alert("Analysis failed due to connection error.");
+                analyzingContent.style.display = 'none';
+                previewContent.style.display = 'flex';
             }
         });
 
