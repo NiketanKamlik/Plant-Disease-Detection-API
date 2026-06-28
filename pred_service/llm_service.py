@@ -16,7 +16,7 @@ def _get_openrouter_api_key() -> str | None:
 
 
 OPENROUTER_API_KEY = _get_openrouter_api_key()
-OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "google/gemini-2.0-flash-001")
+OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "google/gemini-2.5-flash")
 
 def get_medicine_advice(plant: str, disease: str, is_healthy: bool, suggestions: list = None) -> dict:
     """
@@ -62,6 +62,7 @@ def get_medicine_advice(plant: str, disease: str, is_healthy: bool, suggestions:
 
     payload = {
         "model": OPENROUTER_MODEL,
+        "max_tokens": 500,
         "messages": [
             {"role": "system", "content": "You are a helpful agricultural assistant."},
             {"role": "user", "content": prompt}
