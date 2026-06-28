@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const res = await fetch('/api/predict', { method: 'POST', headers, body: formData });
             const data = await res.json();
-            setTimeout(() => showResults(data), 2000);
+            showResults(data);
         } catch (err) {
             console.error(err);
             alert('Analysis failed.');

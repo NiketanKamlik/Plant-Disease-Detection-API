@@ -3,6 +3,7 @@ import json
 import io
 import os
 import base64
+from .disease_advice import get_local_advice
 
 # Plant.id API Configuration (v3)
 # Get your API key at https://admin.kindwise.com/
@@ -60,9 +61,8 @@ def get_external_prediction(image_bytes: bytes) -> dict:
         disease_name = best_disease.get("name", "Healthy")
         confidence = float(best_disease.get("probability", 0) * 100) if not is_healthy else float(best_plant.get("probability", 0) * 100)
         
-        # 7. Get AI advice from OpenRouter (Passing all suggestions for better accuracy)
-        from .llm_service import get_medicine_advice
-        advice = get_medicine_advice(plant_name, disease_name, is_healthy, suggestions=health_suggestions)
+        # 7. Get API-backed advice from the AI service
+        advice = get_local_advice(plant_name, disease_name, is_healthy, suggestions=health_suggestions)
         medicine_text = advice.get("medicine")
         precaution_text = advice.get("precaution")
         

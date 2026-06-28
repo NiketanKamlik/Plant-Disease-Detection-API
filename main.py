@@ -67,6 +67,11 @@ app.include_router(predict.router)
 app.include_router(auth.router)
 app.include_router(apikey.router)
 
+
+@app.get("/healthz")
+def health_check():
+    return {"status": "ok"}
+
 if __name__ == "__main__":
     import uvicorn
     host = os.getenv("APP_HOST", "127.0.0.1")

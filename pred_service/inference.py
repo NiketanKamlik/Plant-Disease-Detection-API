@@ -6,9 +6,9 @@ from PIL import Image
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.efficientnet import preprocess_input
 from .constants import IMG_SIZE, CLASS_NAMES
-# from .disease_info import DISEASE_INFO  # Local data removed in favor of LLM
 from .downloader import download_model_if_missing
 from .external_api import get_external_prediction
+from .disease_advice import get_local_advice
 
 # Configuration for the model
 model_path = os.path.join(os.path.dirname(__file__), "plant_disease_recog_model_pwp.h5")
@@ -81,9 +81,8 @@ def process_image_and_predict(image_bytes: bytes) -> dict:
         # Is the plant healthy?
         is_healthy = "healthy" in disease.lower()
 
-        # Get AI advice from OpenRouter
-        from .llm_service import get_medicine_advice
-        advice = get_medicine_advice(plant, disease, is_healthy)
+        # Get local advice from deterministic guidance rules
+        advice = get_local_advice(plant, disease, is_healthy)
         medicine_text = advice.get("medicine")
         precaution_text = advice.get("precaution")
 
@@ -113,6 +112,23 @@ def process_image_and_predict(image_bytes: bytes) -> dict:
              external_res = get_external_prediction(image_bytes)
              if external_res.get("success"):
                  return external_res
+             else:
+                 print(f"External API failed: {external_res.get('error')}")
+                 if is_background:
+                     return {
+                        "success": True,
+                        "is_healthy": False,
+                        "disease_name": "No Plant Leaf Detected",
+                        "confidence": confidence,
+                        "recommendation": "Please upload a clear, focused image of a plant leaf. The system detected something else and the external analysis API is out of quota.",
+                        "medicine": "N/A",
+                        "precaution": "N/A",
+                        "prediction_source": "Local Model"
+                     }
+                 else:
+                     result_dict["disease_name"] += " (Low Confidence)"
+                     result_dict["recommendation"] += " Note: External analysis is currently unavailable."
+                     return result_dict
 
         return result_dict
         

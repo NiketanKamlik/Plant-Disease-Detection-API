@@ -45,6 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await res.json();
                 if (res.ok && data.success) {
                     sessionStorage.setItem('user', JSON.stringify(data.user));
+                    if (data.access_token) {
+                        sessionStorage.setItem('access_token', data.access_token);
+                    }
                     window.location.href = '/dashboard';
                 } else {
                     alert(data.detail || 'Login failed');
@@ -99,5 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function logout() {
     sessionStorage.removeItem('user');
+    sessionStorage.removeItem('access_token');
     window.location.href = '/login';
 }

@@ -11,6 +11,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const user = JSON.parse(userStr);
     const navAuth = document.getElementById('navAuth');
 
+    const getAuthHeaders = (includeJson = true) => {
+        const headers = {};
+        if (includeJson) {
+            headers['Content-Type'] = 'application/json';
+        }
+        const token = sessionStorage.getItem('access_token');
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+        return headers;
+    };
+
     // Update nav with user info
     if (navAuth) {
         navAuth.innerHTML = `
@@ -38,7 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // ===== HISTORY =====
     const loadHistory = async () => {
         try {
-            const res = await fetch(`/api/auth/history/${user.id}`);
+            const res = await fetch(`/api/auth/history/${user.id}`, {
+                headers: getAuthHeaders(false)
+            });
             const history = await res.json();
             const list = document.getElementById('historyList');
             if (!history || history.length === 0) return;
@@ -56,7 +70,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // ===== PROFILE =====
     const loadProfile = async () => {
         try {
-            const res = await fetch(`/api/auth/profile/${user.id}`);
+            const res = await fetch(`/api/auth/profile/${user.id}`, {
+                headers: getAuthHeaders(false)
+            });
             const data = await res.json();
             document.getElementById('profile-name').value = data.name;
             document.getElementById('profile-email').value = data.email;
@@ -66,7 +82,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // ===== API KEYS =====
     const loadKeys = async () => {
         try {
-            const res = await fetch(`/api/keys/?user_id=${user.id}`);
+            const res = await fetch(`/api/keys/`, {
+                headers: getAuthHeaders(false)
+            });
             const keys = await res.json();
 
             const totalUsage = keys.reduce((sum, k) => sum + (k.usage_count || 0), 0);
@@ -128,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const res = await fetch(`/api/auth/profile/${user.id}`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                        headers: getAuthHeaders(),
                     body: JSON.stringify({
                         name: document.getElementById('profile-name').value,
                         email: document.getElementById('profile-email').value
@@ -156,7 +174,10 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.innerText = 'Generating...';
 
         try {
-            const res = await fetch(`/api/keys/generate?user_id=${user.id}&user_name=${encodeURIComponent(user.name)}&key_name=${encodeURIComponent(keyName)}`, { method: 'POST' });
+            const res = await fetch(`/api/keys/generate?key_name=${encodeURIComponent(keyName)}`, {
+                method: 'POST',
+                headers: getAuthHeaders(false)
+            });
             if (res.ok) { nameInput.value = ''; loadKeys(); }
             else { const data = await res.json(); alert(data.detail || 'Failed to generate key.'); }
         } catch (err) { alert('Connection error.'); }

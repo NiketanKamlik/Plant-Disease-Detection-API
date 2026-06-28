@@ -2,7 +2,7 @@ from fastapi import APIRouter, UploadFile, File, Header, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from pred_service import process_image_and_predict
-from database import database, crud, schemas
+from database import database, crud, schemas, models
 import io
 
 router = APIRouter()
@@ -31,7 +31,7 @@ async def predict_disease(
             raise HTTPException(status_code=401, detail="Invalid or expired API Key")
         
         # Get the key object to check usage
-        db_key = db.query(database.models.APIKey).filter(database.models.APIKey.key == x_api_key).first()
+        db_key = db.query(models.APIKey).filter(models.APIKey.key == x_api_key).first()
         if db_key and db_key.usage_count >= db_key.usage_limit:
             raise HTTPException(status_code=429, detail="API Quota Exhausted. Please upgrade your plan.")
         

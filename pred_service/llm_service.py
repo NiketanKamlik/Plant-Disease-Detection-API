@@ -2,7 +2,20 @@ import os
 import requests
 import json
 
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+def _get_openrouter_api_key() -> str | None:
+    raw_key = os.getenv("OPENROUTER_API_KEY", "").strip()
+    if not raw_key:
+        return None
+
+    # Some .env files accidentally concatenate two keys; keep the first token only.
+    if raw_key.count("sk-or-v1-") > 1:
+        raw_key = raw_key.split("sk-or-v1-", 2)[1]
+        raw_key = "sk-or-v1-" + raw_key.split("sk-or-v1-", 1)[0].strip()
+
+    return raw_key
+
+
+OPENROUTER_API_KEY = _get_openrouter_api_key()
 OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "google/gemini-2.0-flash-001")
 
 def get_medicine_advice(plant: str, disease: str, is_healthy: bool, suggestions: list = None) -> dict:
@@ -65,9 +78,10 @@ def get_medicine_advice(plant: str, disease: str, is_healthy: bool, suggestions:
         )
         
         if response.status_code != 200:
+            error_detail = response.text[:200]
             return {
                 "medicine": f"Error from AI Service: {response.status_code}",
-                "precaution": response.text[:100]
+                "precaution": error_detail
             }
 
         res_data = response.json()
