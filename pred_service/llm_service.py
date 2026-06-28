@@ -79,9 +79,10 @@ def get_medicine_advice(plant: str, disease: str, is_healthy: bool, suggestions:
         
         if response.status_code != 200:
             error_detail = response.text[:200]
+            print(f"OpenRouter Error: {response.status_code} - {error_detail}")
             return {
-                "medicine": f"Error from AI Service: {response.status_code}",
-                "precaution": error_detail
+                "medicine": f"Consult a local agricultural expert or nursery for specific {disease} treatments.",
+                "precaution": f"Isolate the {plant} plant. Ensure proper watering, improve air circulation, and monitor frequently."
             }
 
         res_data = response.json()
