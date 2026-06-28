@@ -73,6 +73,10 @@ async def predict_disease(
                 recommendation=rec_full
             ))
 
+        # If the prediction service encountered an error (e.g. model load failure)
+        if not result.get("success"):
+            return JSONResponse(content={"success": False, "error": result.get("error", "Unknown prediction error")}, status_code=500)
+
         # Return standardized JSON response
         return JSONResponse(content={
             "success": True,

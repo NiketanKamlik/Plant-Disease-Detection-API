@@ -28,6 +28,18 @@ def process_image_and_predict(image_bytes: bytes) -> dict:
     if model is None:
         # Load the model only when needed
         try:
+            # Check for low memory environment (e.g. Render Starter Plan with 512MB RAM)
+            is_low_memory = False
+            if os.path.exists('/proc/meminfo'):
+                with open('/proc/meminfo', 'r') as f:
+                    mem_kb = int(f.readline().split()[1])
+                    if mem_kb < 800000: # Less than ~800MB
+                        is_low_memory = True
+            
+            if is_low_memory:
+                print("Low memory environment detected (<800MB). Skipping local 769MB model to prevent OOM crash.")
+                raise MemoryError("Insufficient RAM to load the local model.")
+
             # First, ensure the model exists (download if missing)
             download_model_if_missing(model_path, MODEL_URL)
             
@@ -36,16 +48,18 @@ def process_image_and_predict(image_bytes: bytes) -> dict:
                 model = tf.keras.models.load_model(model_path)
                 print("Model loaded successfully.")
             else:
+                raise FileNotFoundError(f"Model file not found at {model_path}.")
+        except Exception as e:
+            print(f"Error loading local model: {e}. Falling back to External API.")
+            external_res = get_external_prediction(image_bytes)
+            if external_res.get("success"):
+                external_res["prediction_source"] = "External API (Local Model Fallback)"
+                return external_res
+            else:
                 return {
                     "success": False,
-                    "error": f"Model file not found at {model_path}."
+                    "error": f"Local model failed ({str(e)}) AND External API failed ({external_res.get('error')}). Please configure PLANT_ID_API_KEY in Render."
                 }
-        except Exception as e:
-            print(f"Error loading model: {e}")
-            return {
-                "success": False,
-                "error": f"Failed to load the Machine Learning model: {str(e)}"
-            }
 
     try:
         # Wrap image_bytes in io.BytesIO so image.load_img can read it from memory
